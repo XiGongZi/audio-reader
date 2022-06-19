@@ -4,6 +4,7 @@ const begin: HTMLElement = document.getElementById("intercomBegin") as HTMLEleme
 const end: HTMLElement = document.getElementById("intercomEnd") as HTMLElement;
 
 let record: Recorder; //多媒体对象，用来处理音频
+let speaker: CreateAudioHTML
 /*
  * 开始对讲
  */
@@ -11,7 +12,7 @@ begin.onclick = () => {
     const constraints = { audio: true }
     navigator.mediaDevices.getUserMedia(constraints)
         .then((mediaStream) => {
-            new CreateAudioHTML(mediaStream);
+            speaker = new CreateAudioHTML(mediaStream);
             record = (new Recorder(mediaStream));
             record.onChange = (data: ArrayBuffer) => {
                 console.log("onChange data", data);
@@ -48,5 +49,6 @@ begin.onclick = () => {
  */
 end.onclick = () => {
     record.stop();
+    speaker.removeAudio();
     console.log("关闭对讲以及WebSocket");
 };
