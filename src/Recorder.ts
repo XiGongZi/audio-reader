@@ -6,18 +6,23 @@ class AudioData {
     outputSampleRate: number; //输出采样数位
     oututSampleBits: number; //输出采样率
     constructor({ outputSampleRate, oututSampleBits }: { outputSampleRate: number, oututSampleBits: number }) {
+        console.log("Class AudioData constructor");
         this.outputSampleRate = outputSampleRate;
         this.oututSampleBits = oututSampleBits;
     }
     clear() {
+        console.log("Class AudioData clear");
+
         this.buffer = [];
         this.size = 0;
     }
     input(data: Float32Array) {
+        console.log("Class AudioData input");
         this.buffer.push(new Float32Array(data));
         this.size += data.length;
     }
     compress() {
+        console.log("Class AudioData compress");
         //合并压缩
         //合并
         const data = new Float32Array(this.size);
@@ -40,6 +45,7 @@ class AudioData {
         return result;
     }
     encodePCM() {
+        console.log("Class AudioData encodePCM");
         //这里不对采集到的数据进行其他格式处理，如有需要均交给服务器端处理。
         const sampleRate = Math.min(this.inputSampleRate, this.outputSampleRate);
         const sampleBits = Math.min(this.inputSampleBits, this.oututSampleBits);
@@ -65,6 +71,7 @@ export default class Recorder {
     recorder;
     audioData: AudioData;
     constructor(stream: MediaStream) {
+        console.log("Class Recorder constructor");
         this.stream = stream;
         this.context = new AudioContext();
         this.audioInput = this.context.createMediaStreamSource(stream);
@@ -72,9 +79,12 @@ export default class Recorder {
         this.audioData = new AudioData({ outputSampleRate: this.sampleRate, oututSampleBits: this.sampleBits });
     }
     onChange(e: ArrayBuffer): void {
+        console.log("Class Recorder onChange");
         // return e;
     }
     sendData() {
+        console.log("Class Recorder sendData");
+
         //对以获取的数据进行处理(分包)
         var reader = new FileReader();
         reader.onload = (e) => {
@@ -106,23 +116,28 @@ export default class Recorder {
     };
 
     start() {
+        console.log("Class Recorder start");
         this.audioInput.connect(this.recorder);
         this.recorder.connect(this.context.destination);
     };
 
     stop() {
+        console.log("Class Recorder stop");
         this.recorder.disconnect();
     };
 
     getBlob() {
+        console.log("Class Recorder getBlob");
         return this.audioData.encodePCM();
     };
 
     clear() {
+        console.log("Class Recorder clear");
         this.audioData.clear();
     };
 
     onaudioprocess(e: { inputBuffer: AudioBuffer }) {
+        console.log("Class Recorder onaudioprocess");
         var inputBuffer: Float32Array = e.inputBuffer.getChannelData(0);
         this.audioData.input(inputBuffer);
         this.sendData();
